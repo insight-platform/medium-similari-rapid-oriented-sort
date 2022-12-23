@@ -9,6 +9,7 @@ def parse_args():
     default_dataset_path = Path('/opt/data/WEPDTOF')
     parser.add_argument('--sequences', nargs='+', choices=SEQUENCES, default=SEQUENCES)
     parser.add_argument('--dataset-path', type=Path, default=default_dataset_path)
+    parser.add_argument('--use-cuda', action='store_true')
     return parser.parse_args()
 
 
@@ -16,7 +17,7 @@ def main(args):
     detector = Detector(
         model_name='rapid',
         weights_path='/opt/app/weights/RAPiD.ckpt',
-        use_cuda=True
+        use_cuda=args.use_cuda
     )
 
     for seq in args.sequences:

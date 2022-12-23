@@ -4,7 +4,7 @@ services:
     build: 
       context: .
       dockerfile: docker/rapid/Dockerfile
-    command: ["-m", "rapid.predict", "--sequences", "convenience_store"]
+    command: ["-m", "rapid.predict", "--sequences", "convenience_store", "--use-cuda"]
     volumes:
       - ./data:/opt/data
       - ./weights:/opt/app/weights

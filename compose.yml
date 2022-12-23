@@ -1,0 +1,73 @@
+services:
+  predict-rapid:
+    image: rapid-detector
+    build: 
+      context: .
+      dockerfile: docker/rapid/Dockerfile
+    command: ["-m", "rapid.predict", "--sequences", "convenience_store"]
+    volumes:
+      - ./data:/opt/data
+      - ./weights:/opt/app/weights
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+  draw-gt:
+    image: trackers-similari
+    build:
+      context: .
+      dockerfile: docker/trackers/Dockerfile
+    command: ["-m", "dataset.draw_annotations", "GT", "--sequence", "convenience_store"]
+    volumes:
+      - ./data:/opt/data
+  draw-detections:
+    image: trackers-similari
+    build:
+      context: .
+      dockerfile: docker/trackers/Dockerfile
+    command: ["-m", "dataset.draw_annotations", "rapid", "--sequence", "convenience_store"]
+    volumes:
+      - ./data:/opt/data
+  draw-tracks:
+    image: trackers-similari
+    build:
+      context: .
+      dockerfile: docker/trackers/Dockerfile
+    command: ["-m", "dataset.draw_annotations", "rapid_similari_iou", "--sequence", "convenience_store"]
+    volumes:
+      - ./data:/opt/data
+  predict-trackers:
+    image: trackers-similari
+    build:
+      context: .
+      dockerfile: docker/trackers/Dockerfile
+    command: [
+        "-m", "trackers.predict", "similari_iou",
+        "--sequences", "convenience_store",
+        "--detections", "rapid",
+      ]
+    volumes:
+      - ./data:/opt/data
+  evaluate-trackers:
+    image: trackers-similari
+    build:
+      context: .
+      dockerfile: docker/trackers/Dockerfile
+    command: [
+        "-m", "trackers.evaluate", "similari_iou",
+        "--sequences", "convenience_store",
+        "--detections", "GT", "rapid"
+      ]
+    volumes:
+      - ./data:/opt/data
+  measure-fps-trackers:
+    image: trackers-similari
+    build:
+      context: .
+      dockerfile: docker/trackers/Dockerfile
+    command: ["-m", "trackers.measure_fps", "similari_iou", "--sequence", "call_center", "--detections", "GT"]
+    volumes:
+      - ./data:/opt/data

@@ -1,0 +1,8 @@
+# Ignore everything
+*
+
+# Allow src
+!/src
+
+# Allow requirements
+!/requirements
